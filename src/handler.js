@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const requestModule = require("./request");
-const env = require("dotenv").config();
+require("dotenv").config();
 
 let handleHome = (request, response) => {
   const filePath = path.join(__dirname, "..", "public", "index.html");
@@ -52,10 +52,9 @@ let handleApi = (request, response, endpoint) => {
       response.write("no data");
       response.end();
     } else {
-      let topThreeArticles = data.body.articles.splice(0,3);
+      let topThreeArticles = data.body.articles.slice(0,3);
       response.writeHead(200, { "Content-Type": "application/json" });
       let body = {countryCode:countryCode, topThreeArticles: topThreeArticles}
-      console.log('backend is: ', {statusCode: response.statusCode, body});
       response.write(JSON.stringify({statusCode: response.statusCode, body}));
       response.end();
     }
