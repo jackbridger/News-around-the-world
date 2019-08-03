@@ -94,6 +94,7 @@ let addDom = (elem, title, description, countryCode) => {
 };
 
 let translateArticle = (objNum,titleDesc, countryCode, objToUpdate, elemCallback) => {
+  let language = languageFinder[countryCode];
   let textToTranslate = encodeURI(objToUpdate[objNum][titleDesc])
   let xhr = new XMLHttpRequest();
   xhr.onreadystatechange = () => {
@@ -106,7 +107,7 @@ let translateArticle = (objNum,titleDesc, countryCode, objToUpdate, elemCallback
     })
   }
 }
-  xhr.open("GET", `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20190803T112209Z.efb5a8d3a549a765.302073ca12e12c82eb0d886dab93d379fa79f34f&text=${textToTranslate}&lang=${countryCode}-en`, true);
+  xhr.open("GET", `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20190803T112209Z.efb5a8d3a549a765.302073ca12e12c82eb0d886dab93d379fa79f34f&text=${textToTranslate}&lang=${language}-en`, true);
   xhr.send();
 }
 // window.onload = translateArticle('hello jack','es' );
@@ -116,4 +117,61 @@ let translateArticlesInObj = (originalObj, countryCode, elemCallback) => {
     translateArticle(index,'title', countryCode, originalObj, elemCallback);
     translateArticle(index,'description', countryCode, originalObj, elemCallback);
   });
+}
+
+let languageFinder = {
+  "ae": "ae",
+"ar": "es",
+"at": "at",
+"au": "de",
+"be": "fr",
+"bg": "bg",
+"br": "pt",
+"ca": "en",
+"ch": "de",
+"cn": "zh",
+"co": "es",
+"cu": "es",
+"cz": "cs",
+"de": "de",
+"eg": "ar",
+"fr": "fr",
+"gb": "en",
+"gr": "el",
+"hk": "zh",
+"hu": "hu",
+"id": "id",
+"ie": "en",
+"il": "he",
+"in": "en",
+"it": "it",
+"jp": "ja",
+"kr": "ko",
+"lt": "lt",
+"lv": "lv",
+"ma": "ma",
+"mx": "es",
+"my": "ms",
+"ng": "en",
+"nl": "nl",
+"no": "no",
+"nz": "en",
+"ph": "tl",
+"pl": "pl",
+"pt": "pt",
+"ro": "ro",
+"rs": "sr",
+"ru": "ru",
+"sa": "sa",
+"se": "se",
+"sg": "en",
+"si": "sl",
+"sk": "sv",
+"th": "th",
+"tr": "tr",
+"tw": "zh",
+"ua": "uk",
+"us": "en",
+"ve": "es",
+"za": "en",
 }
