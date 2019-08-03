@@ -8,7 +8,7 @@
     let countryCode = document.querySelector("#country").value;
     // let countryCode = elem.dataset.country;
     if (countryCode !== "") {
-      apiCall(countryCode);
+      apiCall(countryCode, translateArticlesInObj, addDom );
     } else {
       alert("Please select a country in the dropdown menu");
     }
@@ -18,51 +18,69 @@
   countryElements.forEach(elem => {
     elem.addEventListener("click", () => {
       let countryCode = elem.dataset.country;
-      apiCall(countryCode);
+      apiCall(countryCode, translateArticlesInObj, addDom );
     });
   });
 })();
-let apiCall = countryCode => {
+let apiCall = (countryCode, translateCallback, elemCallback) => {
   let xhr = new XMLHttpRequest();
   xhr.onload = response => {
     let articleElements = document.querySelector(".articles-display");
     articleElements.innerHTML = "";
-
-    // const newsObject = JSON.parse(xhr.responseText);
-    // let topThree = newsObject.splice(0, 3);
-    // topThree.forEach(elem => addDom(elem));
 
     if (xhr.status !== 200) {
       let headline = document.createElement("h2");
       headline.textContent = "No data";
       articleElements.appendChild(headline);
     } else {
-      const newsObject = JSON.parse(xhr.responseText);
-      var topThree = newsObject.splice(0, 3);
-      topThree.forEach(elem => addDom(elem));
+        let newsObject = JSON.parse(xhr.responseText).body.topThreeArticles;
+        translateCallback(newsObject, countryCode, elemCallback);
     }
+  
   };
   xhr.open("GET", `/search?${countryCode}`, true);
   xhr.send();
 };
 
-let addDom = obj => {
+// let callDomAdder = (obj, countryCode, elemCallback) => {
+//   console.log('callDom adder', obj);
+//   let translatedCopy = JSON.parse(JSON.stringify(obj))
+//   translatedCopy.forEach(elem => {
+//     elemCallback(elem, elem.title,elem.description, countryCode);
+//   })
+// }
+
+let addDom = (elem, title, description, countryCode) => {
   let articleElements = document.querySelector(".articles-display");
+  console.log(articleElements);
+  console.log(articleElements.firstElementChild);
+  let lenArt = articleElements.childElementCount;
+
+    console.log(lenArt);
+  if (lenArt >= 3) {
+    articleElements.removeChild(articleElements.firstElementChild)
+  }
+  
+  
   let article = document.createElement("article");
   let headline = document.createElement("h2");
   let image = document.createElement("img");
   let text = document.createElement("p");
   let articleURL = document.createElement("a");
 
-  headline.textContent = obj.title;
+  
 
   image.alt = "Image from external source";
-  text.textContent = obj.description;
-  articleURL.href = obj.url;
+  
+  articleURL.href = elem.url;
   articleURL.target = "_blank";
+    headline.textContent = title;
+    text.textContent = description;
+  
 
-  if (obj.urlToImage) {
-    image.src = obj.urlToImage;
+
+  if (elem.urlToImage) {
+    image.src = elem.urlToImage;
   } else {
     image.src =
       "https://images.pexels.com/photos/356079/pexels-photo-356079.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
@@ -74,3 +92,28 @@ let addDom = obj => {
   article.appendChild(image);
   article.appendChild(text);
 };
+
+let translateArticle = (objNum,titleDesc, countryCode, objToUpdate, elemCallback) => {
+  let textToTranslate = encodeURI(objToUpdate[objNum][titleDesc])
+  let xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = () => {
+    if  (xhr.readyState == 4 && xhr.status == 200) {
+    let translation = JSON.parse(xhr.responseText).text[0]
+    objToUpdate[objNum][titleDesc] = translation;
+    
+    objToUpdate.forEach(elem => {
+      elemCallback(elem, elem.title,elem.description, countryCode);
+    })
+  }
+}
+  xhr.open("GET", `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20190803T112209Z.efb5a8d3a549a765.302073ca12e12c82eb0d886dab93d379fa79f34f&text=${textToTranslate}&lang=${countryCode}-en`, true);
+  xhr.send();
+}
+// window.onload = translateArticle('hello jack','es' );
+
+let translateArticlesInObj = (originalObj, countryCode, elemCallback) => {
+  originalObj.forEach((element, index) => {
+    translateArticle(index,'title', countryCode, originalObj, elemCallback);
+    translateArticle(index,'description', countryCode, originalObj, elemCallback);
+  });
+}

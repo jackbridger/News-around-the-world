@@ -52,8 +52,11 @@ let handleApi = (request, response, endpoint) => {
       response.write("no data");
       response.end();
     } else {
+      let topThreeArticles = data.body.articles.splice(0,3);
       response.writeHead(200, { "Content-Type": "application/json" });
-      response.write(JSON.stringify(data.body.articles));
+      let body = {countryCode:countryCode, topThreeArticles: topThreeArticles}
+      console.log('backend is: ', {statusCode: response.statusCode, body});
+      response.write(JSON.stringify({statusCode: response.statusCode, body}));
       response.end();
     }
   });
