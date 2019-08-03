@@ -34,8 +34,7 @@ let apiCall = countryCode => {
       articleElements.appendChild(headline);
     } else {
       const newsObject = JSON.parse(xhr.responseText);
-      var topThree = newsObject.splice(0, 3);
-      topThree.forEach(elem => addDom(elem));
+      newsObject.forEach(elem => addDom(elem));
     }
   };
   xhr.open("GET", `/search?${countryCode}`, true);
@@ -75,7 +74,6 @@ let translateArticle = () => {
   let textToTranslate = encodeURI('hello there i am jack')
   let xhr = new XMLHttpRequest();
   xhr.onload = response => {
-    
     let translation = JSON.parse(xhr.responseText).text[0]
     console.log(translation);
   }

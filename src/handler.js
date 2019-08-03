@@ -52,8 +52,9 @@ let handleApi = (request, response, endpoint) => {
       response.write("no data");
       response.end();
     } else {
+      let topThreeArticles = data.body.articles.splice(0,3);
       response.writeHead(200, { "Content-Type": "application/json" });
-      response.write(JSON.stringify(data.body.articles));
+      response.write(JSON.stringify(topThreeArticles));
       response.end();
     }
   });
