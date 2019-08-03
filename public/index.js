@@ -28,10 +28,6 @@ let apiCall = countryCode => {
     let articleElements = document.querySelector(".articles-display");
     articleElements.innerHTML = "";
 
-    // const newsObject = JSON.parse(xhr.responseText);
-    // let topThree = newsObject.splice(0, 3);
-    // topThree.forEach(elem => addDom(elem));
-
     if (xhr.status !== 200) {
       let headline = document.createElement("h2");
       headline.textContent = "No data";
@@ -74,3 +70,16 @@ let addDom = obj => {
   article.appendChild(image);
   article.appendChild(text);
 };
+
+let translateArticle = () => {
+  let textToTranslate = encodeURI('hello there i am jack')
+  let xhr = new XMLHttpRequest();
+  xhr.onload = response => {
+    
+    let translation = JSON.parse(xhr.responseText).text[0]
+    console.log(translation);
+  }
+  xhr.open("GET", `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20190803T112209Z.efb5a8d3a549a765.302073ca12e12c82eb0d886dab93d379fa79f34f&text=${textToTranslate}&lang=en-es`, true);
+  xhr.send();
+}
+window.onload = translateArticle();
