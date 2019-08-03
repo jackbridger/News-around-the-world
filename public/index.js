@@ -33,15 +33,43 @@ let apiCall = countryCode => {
       headline.textContent = "No data";
       articleElements.appendChild(headline);
     } else {
-      const newsObject = JSON.parse(xhr.responseText);
-      newsObject.forEach(elem => addDom(elem));
+
+      var newsObject = {}
+      let firstPromise = () => {return new Promise((resolve, reject) => {
+        newsObject = JSON.parse(xhr.responseText).body.topThreeArticles;
+        if (newsObject) {
+          console.log(newsObject);
+        }
+        else {
+          reject(Error("It broke"));
+        }
+      })}
+      let promiseTranslate = () => {return new Promise((resolve, reject) => {
+        translateArticlesInObj(newsObject, countryCode);
+        if (newsObject) {
+          console.log(newsObject);
+        }
+        else {
+          reject(Error("It broke"));
+        }
+      })}
+
+      let updateElems = () => {newsObject.forEach(elem => {
+        console.log(newsObject);
+        console.log(elem);
+        addDom(elem, countryCode);
+      })}
+      
+      firstPromise().then(promiseTranslate()).then(updateElems())
     }
   };
   xhr.open("GET", `/search?${countryCode}`, true);
   xhr.send();
 };
 
-let addDom = obj => {
+let addDom = (obj, countryCode) => {
+
+  
   let articleElements = document.querySelector(".articles-display");
   let article = document.createElement("article");
   let headline = document.createElement("h2");
@@ -49,12 +77,16 @@ let addDom = obj => {
   let text = document.createElement("p");
   let articleURL = document.createElement("a");
 
-  headline.textContent = obj.title;
+  
 
   image.alt = "Image from external source";
-  text.textContent = obj.description;
+  
   articleURL.href = obj.url;
   articleURL.target = "_blank";
+    headline.textContent = obj.title;
+    text.textContent = obj.description;
+  
+
 
   if (obj.urlToImage) {
     image.src = obj.urlToImage;
@@ -70,14 +102,22 @@ let addDom = obj => {
   article.appendChild(text);
 };
 
-let translateArticle = () => {
-  let textToTranslate = encodeURI('hello there i am jack')
+let translateArticle = (objNum,titleDesc, countryCode, objToUpdate) => {
+  let textToTranslate = encodeURI(objToUpdate[objNum][titleDesc])
   let xhr = new XMLHttpRequest();
   xhr.onload = response => {
     let translation = JSON.parse(xhr.responseText).text[0]
-    console.log(translation);
+    objToUpdate[objNum][titleDesc] = translation;
+
   }
-  xhr.open("GET", `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20190803T112209Z.efb5a8d3a549a765.302073ca12e12c82eb0d886dab93d379fa79f34f&text=${textToTranslate}&lang=en-es`, true);
+  xhr.open("GET", `https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20190803T112209Z.efb5a8d3a549a765.302073ca12e12c82eb0d886dab93d379fa79f34f&text=${textToTranslate}&lang=${countryCode}-en`, true);
   xhr.send();
 }
-window.onload = translateArticle();
+// window.onload = translateArticle('hello jack','es' );
+
+let translateArticlesInObj = (originalObj, countryCode) => {
+  originalObj.forEach((element, index) => {
+    translateArticle(index,'title', countryCode, originalObj);
+    translateArticle(index,'description', countryCode, originalObj);
+  });
+}
