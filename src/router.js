@@ -6,10 +6,7 @@ const router = (request, response) => {
     handleHome(request, response);
   } else if (endpoint.indexOf("public") !== -1) {
     handlePublic(request, response, endpoint);
-  } else if (endpoint.startsWith("/translate")) {
-    handleTranslate(request, response, endpoint);
-  }
-  else if (endpoint.includes("/search")) {
+  } else if (endpoint.includes("/search")) {
     handleApi(request, response, endpoint);
   } else {
     response.writeHead(404, { "Content-Type": "text/html" });

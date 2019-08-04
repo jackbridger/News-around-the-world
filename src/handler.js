@@ -1,11 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-const requestModule = require("./request");
+const extensions = require("./extensions");
+let requestModule = require("./request");
+const translate = require("./translate");
 require("dotenv").config();
 
 let handleHome = (request, response) => {
   const filePath = path.join(__dirname, "..", "public", "index.html");
-
   fs.readFile(filePath, (err, file) => {
     if (err) {
       response.writeHead(500, { "Content-Type": "text/html" });
@@ -19,16 +20,6 @@ let handleHome = (request, response) => {
 
 let handlePublic = (request, response, endpoint) => {
   const fileType = endpoint.split(".")[1];
-  const extensions = {
-    html: "text/html",
-    css: "text/css",
-    js: "application/javascript",
-    ico: "image/x-icon",
-    jpeg: "image/jpeg",
-    jpg: "image/jpeg",
-    png: "image/png"
-  };
-
   const filePath = path.join(__dirname, "..", endpoint);
   fs.readFile(filePath, (err, file) => {
     if (err) {
@@ -49,42 +40,17 @@ let handleApi = (request, response, endpoint) => {
     if (err) {
       console.error(err);
       response.writeHead(400, { "Content-Type": "text/html" });
-      response.write("no data");
-      response.end();
-    } else {
+      response.end("no data");
+    } 
+    else {
       let topThreeArticles = data.body.articles.slice(0,3);
-      response.writeHead(200, { "Content-Type": "application/json" });
       let body = {countryCode:countryCode, topThreeArticles: topThreeArticles}
-      response.write(JSON.stringify({statusCode: response.statusCode, body}));
-      response.end();
+      translate(topThreeArticles, countryCode, () => {
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({statusCode: response.statusCode, body}));
+      } )
     }
   });
 };
 
-let handleTranslate = (request, response, endpoint) => {
-  let textToTranslate = 'hola amigo'
-  let langFrom = "es";
-  let langTo = "en";
-  let translateKey = process.env.APIKEYTRANSLATE;
-  const urlYandex = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${translateKey}&text=${textToTranslate}&lang=${langFrom}-${langTo}`;
-  
-  requestModule(urlYandex, (err, data) => {
-    if (err) {
-      console.error(err);
-      response.writeHead(400, { "Content-Type": "text/html" });
-      response.write("no data");
-      response.end();
-    } else {
-      response.writeHead(200, { "Content-Type": "text/html" });
-      response.write(data.body.text[0]);
-      response.end();
-    }
-  });
-
-
-
-
-}
-
-
-module.exports = { handleHome, handlePublic, handleApi, handleTranslate };
+module.exports = { handleHome, handlePublic, handleApi };
