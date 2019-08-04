@@ -61,4 +61,30 @@ let handleApi = (request, response, endpoint) => {
   });
 };
 
-module.exports = { handleHome, handlePublic, handleApi };
+let handleTranslate = (request, response, endpoint) => {
+  let textToTranslate = 'hola amigo'
+  let langFrom = "es";
+  let langTo = "en";
+  let translateKey = process.env.APIKEYTRANSLATE;
+  const urlYandex = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${translateKey}&text=${textToTranslate}&lang=${langFrom}-${langTo}`;
+  
+  requestModule(urlYandex, (err, data) => {
+    if (err) {
+      console.error(err);
+      response.writeHead(400, { "Content-Type": "text/html" });
+      response.write("no data");
+      response.end();
+    } else {
+      response.writeHead(200, { "Content-Type": "text/html" });
+      response.write(data.body.text[0]);
+      response.end();
+    }
+  });
+
+
+
+
+}
+
+
+module.exports = { handleHome, handlePublic, handleApi, handleTranslate };
