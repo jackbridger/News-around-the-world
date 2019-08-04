@@ -1,17 +1,18 @@
+
+// BEGINNING OF IIFE
 (() => {
   let countryElements = document.querySelectorAll(".country-select");
 
   // This event listener is for the drop down selection option
 
   let search = document.querySelector("#searchbutton");
-  search.addEventListener("click", () => {
-    let countryCode = document.querySelector("#country").value;
-    // let countryCode = elem.dataset.country;
-    if (countryCode !== "") {
-      apiCall(countryCode);
-    } else {
-      alert("Please select a country in the dropdown menu");
-    }
+    search.addEventListener("click", () => {
+      let countryCode = document.querySelector("#country").value;
+      if (countryCode !== "") {
+        apiCall(countryCode);
+      } else {
+        alert("Please select a country in the dropdown menu");
+      }
   });
 
   // This event listener is for the quick select country buttons
@@ -21,16 +22,15 @@
       apiCall(countryCode);
     });
   });
+
 })();
+// END OF IIFE
+
 let apiCall = countryCode => {
   let xhr = new XMLHttpRequest();
-  xhr.onload = response => {
+  xhr.onload = () => {
     let articleElements = document.querySelector(".articles-display");
     articleElements.innerHTML = "";
-
-    // const newsObject = JSON.parse(xhr.responseText);
-    // let topThree = newsObject.splice(0, 3);
-    // topThree.forEach(elem => addDom(elem));
 
     if (xhr.status !== 200) {
       let headline = document.createElement("h2");

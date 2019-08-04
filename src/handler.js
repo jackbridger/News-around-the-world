@@ -41,7 +41,8 @@ let handleApi = (request, response, endpoint) => {
       console.error(err);
       response.writeHead(400, { "Content-Type": "text/html" });
       response.end("no data");
-    } else {
+    } 
+    else {
       let topThreeArticles = data.body.articles.slice(0,3);
       let body = {countryCode:countryCode, topThreeArticles: topThreeArticles}
       translate(topThreeArticles, countryCode, () => {
