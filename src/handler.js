@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-const requestModule = require("./request");
+let requestModule = require("./request");
+const translate = require("./translate")
 require("dotenv").config();
 
 let handleHome = (request, response) => {
@@ -56,7 +57,8 @@ let handleApi = (request, response, endpoint) => {
       response.writeHead(200, { "Content-Type": "application/json" });
       let body = {countryCode:countryCode, topThreeArticles: topThreeArticles}
       
-      translateObj(body, () => {
+      translate(topThreeArticles, countryCode, () => {
+        console.log("callback: " + topThreeArticles);
         response.write(JSON.stringify({statusCode: response.statusCode, body}));
         response.end();
       } )
@@ -64,47 +66,5 @@ let handleApi = (request, response, endpoint) => {
   });
 };
 
-let translateObj = (object, callback) => {
-  let langFrom = object.countryCode;
-  let langTo = "en";
-  
-  let textToTranslate = encodeURI(object.topThreeArticles[0].title);
-  let translateKey = process.env.APIKEYTRANSLATE;
-  console.log(object);
-  console.log({textToTranslate});
-  
-  
-  const urlYandex = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${translateKey}&text=${textToTranslate}&lang=${langFrom}-${langTo}`;
-  
-  requestModule(urlYandex, (err, data) => {
-    if (err) {
-      console.error(err);
-    } else {
-      object.topThreeArticles[0].title = data.body.text[0];
-      callback();
-    }
-  });
-}
 
-  let handleTranslate = (request, response, endpoint) => {
-    let textToTranslate = 'hola amigo'
-    let langFrom = "es";
-    let langTo = "en";
-    let translateKey = process.env.APIKEYTRANSLATE;
-    const urlYandex = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${translateKey}&text=${textToTranslate}&lang=${langFrom}-${langTo}`;
-    
-    requestModule(urlYandex, (err, data) => {
-      if (err) {
-        console.error(err);
-        response.writeHead(400, { "Content-Type": "text/html" });
-        response.write("no data");
-        response.end();
-      } 
-      else {
-        response.writeHead(200, { "Content-Type": "text/html" });
-        response.write(data.body.text[0]);
-        response.end();
-      }
-    });
-  }
-    module.exports = { handleHome, handlePublic, handleApi, handleTranslate };
+    module.exports = { handleHome, handlePublic, handleApi };
