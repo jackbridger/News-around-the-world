@@ -55,36 +55,56 @@ let handleApi = (request, response, endpoint) => {
       let topThreeArticles = data.body.articles.slice(0,3);
       response.writeHead(200, { "Content-Type": "application/json" });
       let body = {countryCode:countryCode, topThreeArticles: topThreeArticles}
-      response.write(JSON.stringify({statusCode: response.statusCode, body}));
-      response.end();
+      
+      translateObj(body, () => {
+        response.write(JSON.stringify({statusCode: response.statusCode, body}));
+        response.end();
+      } )
     }
   });
 };
 
-let handleTranslate = (request, response, endpoint) => {
-  let textToTranslate = 'hola amigo'
-  let langFrom = "es";
+let translateObj = (object, callback) => {
+  let langFrom = object.countryCode;
   let langTo = "en";
+  
+  let textToTranslate = encodeURI(object.topThreeArticles[0].title);
   let translateKey = process.env.APIKEYTRANSLATE;
+  console.log(object);
+  console.log({textToTranslate});
+  
+  
   const urlYandex = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${translateKey}&text=${textToTranslate}&lang=${langFrom}-${langTo}`;
   
   requestModule(urlYandex, (err, data) => {
     if (err) {
       console.error(err);
-      response.writeHead(400, { "Content-Type": "text/html" });
-      response.write("no data");
-      response.end();
     } else {
-      response.writeHead(200, { "Content-Type": "text/html" });
-      response.write(data.body.text[0]);
-      response.end();
+      object.topThreeArticles[0].title = data.body.text[0];
+      callback();
     }
   });
-
-
-
-
 }
 
-
-module.exports = { handleHome, handlePublic, handleApi, handleTranslate };
+  let handleTranslate = (request, response, endpoint) => {
+    let textToTranslate = 'hola amigo'
+    let langFrom = "es";
+    let langTo = "en";
+    let translateKey = process.env.APIKEYTRANSLATE;
+    const urlYandex = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${translateKey}&text=${textToTranslate}&lang=${langFrom}-${langTo}`;
+    
+    requestModule(urlYandex, (err, data) => {
+      if (err) {
+        console.error(err);
+        response.writeHead(400, { "Content-Type": "text/html" });
+        response.write("no data");
+        response.end();
+      } 
+      else {
+        response.writeHead(200, { "Content-Type": "text/html" });
+        response.write(data.body.text[0]);
+        response.end();
+      }
+    });
+  }
+    module.exports = { handleHome, handlePublic, handleApi, handleTranslate };
