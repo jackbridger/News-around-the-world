@@ -2,12 +2,6 @@ const supertest = require("supertest");
 const tape = require("tape");
 const router = require("../src/router");
 
-tape("Initialise", t => {
-  let num = 2;
-  t.equal(num, 2, "should equal 2");
-  t.end();
-});
-
 tape("Home route returns a status code of 200", t => {
   supertest(router)
     .get("/")
@@ -32,9 +26,9 @@ tape("Home route returns a status code of 200", t => {
 
 // tape("Search returns a status code of 200 and any file in public folder", t => {
 //   supertest(router)
-//     .get("/public.css")
+//     .get("/search?us")
 //     .expect(200)
-//     .expect("Content-type", /css/)
+//     .expect("Content-type", "application/json")
 //     .end((err, res) => {
 //       t.error(err);
 //       t.end();
@@ -51,3 +45,16 @@ tape("Return an error if the route is wrong", t => {
       t.end("");
     });
 });
+
+// tape("Translate returns a status code of 200 and text", t => {
+//   let textToTranslate = encodeURI('hola amigo');
+//   supertest(router)
+//     .get(`/translate?from=es&to=en&text=${textToTranslate}`)
+//     .expect(200)
+//     .expect("Content-Type", "text/html")
+//     .expect('hello friend')
+//     .end((err, res) => {
+//       t.error(err);
+//       t.end();
+//     });
+// });
