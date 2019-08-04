@@ -8,8 +8,7 @@ const router = (request, response) => {
     handlePublic(request, response, endpoint);
   } else if (endpoint.startsWith("/translate")) {
     handleTranslate(request, response, endpoint);
-  }
-  else if (endpoint.includes("/search")) {
+  } else if (endpoint.includes("/search")) {
     handleApi(request, response, endpoint);
   } else {
     response.writeHead(404, { "Content-Type": "text/html" });
