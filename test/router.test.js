@@ -45,16 +45,3 @@ tape("Return an error if the route is wrong", t => {
       t.end("");
     });
 });
-
-tape("Translate returns a status code of 200 and translation", t => {
-  let textToTranslate = encodeURI('hola amigo');
-  supertest(router)
-    .get(`/translate?from=es&to=en&text=${textToTranslate}`)
-    .expect(200)
-    .expect("Content-Type", "text/html")
-    .expect('hello friend')
-    .end((err, res) => {
-      t.error(err);
-      t.end();
-    });
-});
