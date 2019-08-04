@@ -1,4 +1,5 @@
 const requestModule = require("./request");
+const countryCodes = require("./countryCodes");
 
 require("dotenv").config();
 
@@ -12,12 +13,10 @@ let translateAllArticles = (object, countryCode, callback) => {
       translateOneThing(element, countryCode,'description',false)
     }
   });
-  
 }
 
-
 let translateOneThing = (object, countryCode, titleDesc, callback ) => {
-    let langFrom = countryCode;
+    let langFrom = countryCodes[countryCode];
     let langTo = "en";
     
     let textToTranslate = encodeURI(object[titleDesc]);
@@ -30,7 +29,9 @@ let translateOneThing = (object, countryCode, titleDesc, callback ) => {
       } else {
         object[titleDesc] = data.body.text[0];
         if (callback) {
-          callback();
+          setTimeout(() => {
+            callback();
+          }, 500);
         }
       }
     });

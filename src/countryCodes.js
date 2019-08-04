@@ -1,7 +1,4 @@
-module.exports = {translateArticlesInObj}
-
-
-  const languageFinder = {
+module.exports = {
     "ae": "ae",
   "ar": "es",
   "at": "at",

@@ -1,12 +1,12 @@
 const fs = require("fs");
 const path = require("path");
+const extensions = require("./extensions");
 let requestModule = require("./request");
-const translate = require("./translate")
+const translate = require("./translate");
 require("dotenv").config();
 
 let handleHome = (request, response) => {
   const filePath = path.join(__dirname, "..", "public", "index.html");
-
   fs.readFile(filePath, (err, file) => {
     if (err) {
       response.writeHead(500, { "Content-Type": "text/html" });
@@ -20,16 +20,6 @@ let handleHome = (request, response) => {
 
 let handlePublic = (request, response, endpoint) => {
   const fileType = endpoint.split(".")[1];
-  const extensions = {
-    html: "text/html",
-    css: "text/css",
-    js: "application/javascript",
-    ico: "image/x-icon",
-    jpeg: "image/jpeg",
-    jpg: "image/jpeg",
-    png: "image/png"
-  };
-
   const filePath = path.join(__dirname, "..", endpoint);
   fs.readFile(filePath, (err, file) => {
     if (err) {
@@ -50,21 +40,16 @@ let handleApi = (request, response, endpoint) => {
     if (err) {
       console.error(err);
       response.writeHead(400, { "Content-Type": "text/html" });
-      response.write("no data");
-      response.end();
+      response.end("no data");
     } else {
       let topThreeArticles = data.body.articles.slice(0,3);
-      response.writeHead(200, { "Content-Type": "application/json" });
       let body = {countryCode:countryCode, topThreeArticles: topThreeArticles}
-      
       translate(topThreeArticles, countryCode, () => {
-        console.log("callback: " + topThreeArticles);
-        response.write(JSON.stringify({statusCode: response.statusCode, body}));
-        response.end();
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({statusCode: response.statusCode, body}));
       } )
     }
   });
 };
 
-
-    module.exports = { handleHome, handlePublic, handleApi };
+module.exports = { handleHome, handlePublic, handleApi };
