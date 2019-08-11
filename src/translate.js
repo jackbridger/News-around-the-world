@@ -4,22 +4,26 @@ const countryCodes = require("./countryCodes");
 require("dotenv").config();
 
 let translateAllArticles = (object, countryCode, callback) => {
-  object.forEach((element, index) => {
-    translateOneThing(element, countryCode,'title', false);
-    if (index === 2) {
-    translateOneThing(element, countryCode,'description',callback);
+  let counter = (object.length)*2;
+  const checkIfFinished=()=>{
+    counter--;
+    if(counter === 0){
+      callback();
     }
-    else {
-      translateOneThing(element, countryCode,'description',false)
-    }
+  }
+
+  object.forEach((element) => {
+    translateOneThing(element, countryCode,'title',checkIfFinished);
+    translateOneThing(element, countryCode,'description',checkIfFinished);
   });
 }
 
 let translateOneThing = (object, countryCode, titleDesc, callback ) => {
     let langFrom = countryCodes[countryCode];
     let langTo = "en";
-    
+
     let textToTranslate = encodeURI(object[titleDesc]);
+
     let translateKey = process.env.APIKEYTRANSLATE;
     const urlYandex = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${translateKey}&text=${textToTranslate}&lang=${langFrom}-${langTo}`;
 
@@ -28,16 +32,8 @@ let translateOneThing = (object, countryCode, titleDesc, callback ) => {
         console.error(err);
       } else {
         object[titleDesc] = data.body.text[0];
-        if (callback) {
-          setTimeout(() => {
-            callback();
-          }, 500);
-        }
       }
+      callback();
     });
   }
-
-
-
-
-  module.exports = translateAllArticles;
+ module.exports = translateAllArticles;
