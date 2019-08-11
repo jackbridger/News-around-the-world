@@ -3,12 +3,11 @@ const countryCodes = require("./countryCodes");
 
 require("dotenv").config();
 
-
 let translateAllArticles = (object, countryCode, callback) => {
-  let counter=(object.length)*2;
+  let counter = (object.length)*2;
   const checkIfFinished=()=>{
     counter--;
-    if(counter===0){
+    if(counter === 0){
       callback();
     }
   }
