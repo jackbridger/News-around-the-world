@@ -16,9 +16,15 @@ npm install
 ```
 The project requires you to have a file .env in main directory, containing the API key. Our team will provide you with tha content of that file on request. Alternativel, you can get your own API key and add a .env file to the root folder with: 
 
+- https://newsapi.org/docs/endpoints/top-headlines 
+- https://tech.yandex.com/translate/doc/dg/reference/translate-docpage/
+
 ```
 DB_APIKEYNEWS=your_own_APIkey
+APIKEYTRANSLATE=your_own_key
 ```
+
+
 
 Once you have all dependencies and the API key, you can run the server with: 
 

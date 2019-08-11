@@ -1,43 +1,38 @@
-const requestModule = require("./request");
 const countryCodes = require("./countryCodes");
+const fetch = require('node-fetch');
 
 require("dotenv").config();
 
-let translateAllArticles = (object, countryCode, callback) => {
-  object.forEach((element, index) => {
-    translateOneThing(element, countryCode,'title', false);
-    if (index === 2) {
-    translateOneThing(element, countryCode,'description',callback);
-    }
-    else {
-      translateOneThing(element, countryCode,'description',false)
-    }
-  });
+const translateOneThing = async (object, countryCode, titleDesc, callback) => {
+  const langFrom = countryCodes[countryCode];
+  const langTo = "en";
+  const textToTranslate = encodeURI(object[titleDesc]);
+  const translateKey = process.env.APIKEYTRANSLATE;
+  const urlYandex = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${translateKey}&text=${textToTranslate}&lang=${langFrom}-${langTo}`;
+
+  await fetch(urlYandex)
+    .then(res => res.json())
+    .then(json => {
+      return object[titleDesc] = json.text[0];
+    }).then(() => {
+      if (callback) {
+        callback();
+      }   
+    });
 }
 
-let translateOneThing = (object, countryCode, titleDesc, callback ) => {
-    let langFrom = countryCodes[countryCode];
-    let langTo = "en";
-    
-    let textToTranslate = encodeURI(object[titleDesc]);
-    let translateKey = process.env.APIKEYTRANSLATE;
-    const urlYandex = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${translateKey}&text=${textToTranslate}&lang=${langFrom}-${langTo}`;
+const translateAllArticles = (articles, countryCode, callback) => {
+  articles.forEach((article, index) => { 
+    if (index === articles.length - 1) {
+      translateOneThing(article, countryCode, 'description', false).then(() => {
+        translateOneThing(article, countryCode, 'title', callback);
+      });
+    } else {
+      translateOneThing(article, countryCode, 'description', false)
+      translateOneThing(article, countryCode, 'title', false);
+    }
+  });
 
-    requestModule(urlYandex, (err, data) => {
-      if (err) {
-        console.error(err);
-      } else {
-        object[titleDesc] = data.body.text[0];
-        if (callback) {
-          setTimeout(() => {
-            callback();
-          }, 500);
-        }
-      }
-    });
-  }
+}
 
-
-
-
-  module.exports = translateAllArticles;
+module.exports = translateAllArticles;
